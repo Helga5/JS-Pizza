@@ -1,87 +1,109 @@
-/**
- * Created by chaika on 02.02.16.
- */
-var Templates = require('../Templates');
+const TEMPLATES = require("../Templates");
+const LOCAL_STORAGE = require("../LocalStorage");
+const CART_TOGGLER = require("../CartToggler");
 
-//Перелік розмірів піци
-var PizzaSize = {
-    Big: "big_size",
-    Small: "small_size"
+const PIZZA_SIZE = {
+    Small: { field: "smallSize", string: "Мала" },
+    Big: { field: "bigSize", string: "Велика" }
 };
 
-//Змінна в якій зберігаються перелік піц в кошику
-var Cart = [];
+let CART = [];
 
-//HTML едемент куди будуть додаватися піци
-var $cart = $("#cart");
+const $CART = $("#cart-body");
+const $ITEMS_COUNT = $("#cart-items-count");
+const $TOTAL_PRICE = $(".total-price-value");
+
+$("#clear-order").click(clearCart);
 
 function addToCart(pizza, size) {
-    //Додавання однієї піци в кошик покупок
+    let pizzaInCart;
+    for (let i = 0; i < CART.length; i++)
+        if (
+            CART[i].pizza.title === pizza.title &&
+            CART[i].size.field === size.field
+        ) {
+            pizzaInCart = CART[i];
+            break;
+        }
 
-    //Приклад реалізації, можна робити будь-яким іншим способом
-    Cart.push({
-        pizza: pizza,
-        size: size,
-        quantity: 1
+    if (pizzaInCart) pizzaInCart.quantity++;
+    else
+        CART.push({
+            pizza: pizza,
+            size: size,
+            quantity: 1
+        });
+    updateCart();
+}
+
+function clearCart() {
+    CART = [];
+    updateCart();
+}
+
+function removeFromCart(item) {
+    CART.splice(CART.indexOf(item), 1);
+    updateCart();
+}
+
+function initializeCart() {
+    let cart = LOCAL_STORAGE.get("cart");
+    if (cart) CART = cart;
+    CART_TOGGLER.initializeCart();
+    $("#order-button").click(() => {
+        if (CART.length > 0) window.location.href = "/order";
     });
-
-    //Оновити вміст кошика на сторінці
-    updateCart();
-}
-
-function removeFromCart(cart_item) {
-    //Видалити піцу з кошика
-    //TODO: треба зробити
-
-    //Після видалення оновити відображення
-    updateCart();
-}
-
-function initialiseCart() {
-    //Фукнція віпрацьвуватиме при завантаженні сторінки
-    //Тут можна наприклад, зчитати вміст корзини який збережено в Local Storage то показати його
-    //TODO: ...
-
     updateCart();
 }
 
 function getPizzaInCart() {
-    //Повертає піци які зберігаються в кошику
-    return Cart;
+    return CART;
 }
 
 function updateCart() {
-    //Функція викликається при зміні вмісту кошика
-    //Тут можна наприклад показати оновлений кошик на екрані та зберегти вміт кошика в Local Storage
+    LOCAL_STORAGE.set("cart", CART);
 
-    //Очищаємо старі піци в кошику
-    $cart.html("");
+    $CART.html("");
+    $ITEMS_COUNT.text(CART.length);
 
-    //Онволення однієї піци
-    function showOnePizzaInCart(cart_item) {
-        var html_code = Templates.PizzaCart_OneItem(cart_item);
+    function showOnePizzaInCart(item) {
+        var htmlCode = TEMPLATES.PizzaCartItem(item);
+        var $node = $(htmlCode);
 
-        var $node = $(html_code);
-
-        $node.find(".plus").click(function(){
-            //Збільшуємо кількість замовлених піц
-            cart_item.quantity += 1;
-
-            //Оновлюємо відображення
+        $node.find(".plus").click(() => {
+            item.quantity++;
             updateCart();
         });
 
-        $cart.append($node);
+        $node.find(".minus").click(() => {
+            item.quantity--;
+            if (item.quantity < 1) removeFromCart(item);
+            updateCart();
+        });
+
+        $node.find(".remove").click(() => {
+            removeFromCart(item);
+        });
+
+        $CART.append($node);
     }
 
-    Cart.forEach(showOnePizzaInCart);
+    function updateTotalPrice() {
+        let price = 0;
 
+        CART.forEach(item => {
+            price += item.quantity * item.pizza[item.size.field].price;
+        });
+
+        $TOTAL_PRICE.text(price);
+    }
+
+    CART.forEach(showOnePizzaInCart);
+    updateTotalPrice();
 }
 
 exports.removeFromCart = removeFromCart;
 exports.addToCart = addToCart;
-
 exports.getPizzaInCart = getPizzaInCart;
-exports.initialiseCart = initialiseCart;
-
-exports.PizzaSize = PizzaSize;
+exports.initializeCart = initializeCart;
+exports.PizzaSize = PIZZA_SIZE;
