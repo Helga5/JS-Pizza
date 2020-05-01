@@ -1,23 +1,24 @@
-let express = require("express");
-let path = require("path");
-let morgan = require("morgan");
-let bodyParser = require("body-parser");
+var express = require("express");
+var path = require("path");
+var morgan = require("morgan");
+var bodyParser = require("body-parser");
 
 function configureEndpoints(app) {
-    let pages = require("./pages");
-    let api = require("./api");
+	// Пользуется данными, которые лежат в pages и api
+    var pages = require("./pages");
+    var api = require("./api");
 
     //Налаштування URL за якими буде відповідати сервер
     //Отримання списку піц
-    app.get("/api/get-pizza-list/", api.getPizzaList);
-    app.post("/api/create-order/", api.createOrder);
+    app.get("/api/get-pizza-list/", api.getPizzaList); // Забираем данные
+    app.post("/api/create-order/", api.createOrder); // Отправляем данные
 
     //Сторінки
     //Головна сторінка
-    app.get("/", pages.mainPage);
+    app.get("/", pages.mainPage); // Делает html страницу и возвращает нам
 
     //Сторінка замовлення
-    app.get("/order", pages.orderPage);
+    app.get("/order.html", pages.orderPage);
 
     //Якщо не підійшов жоден url, тоді повертаємо файли з папки www
     app.use(express.static(path.join(__dirname, "../Frontend/www")));
@@ -25,7 +26,7 @@ function configureEndpoints(app) {
 
 function startServer(port) {
     //Створюється застосунок
-    let app = express();
+    var app = express();
 
     //Налаштування директорії з шаблонами
     app.set("views", path.join(__dirname, "views"));

@@ -1,137 +1,111 @@
 <% include common/header.ejs %>
 
-<div id="wrapper" class="cart-visible">
-    <div id="order-main">
-
-        <nav id="navbar" class="navbar sticky-top bg-dark">
-            <div id="first-line">
-                <span id="phone">(044) 222 5 222</span>
-                <span id="time" class="d-none d-lg-inline-block">24 години/7 днів на тиждень</span>
-                <span id="delivery" class="d-none d-xl-inline-block">Безкоштовна доставка піци</span>
-                <button id="signin" class="btn btn-warning shadow-none float-right">Ввійти</button>
-            </div>
-            <div id="second-line">
-                <div id="title" class="visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">Піца
+<div id="main" class="container-fluid">
+    <div id="range" class="container">
+        <div id="range-navbar" class="navbar navbar-fixed-top navbar-inverse">
+            <div id="navbar-main">
+                <div class="navbar-first-line">
+                    <div class="navbar-phone">(044) 101 5 610</div>
+                    <div class="visible-md-inline-block visible-lg-inline-block navbar-allhours">24 години/7 днів на тиждень</div>
+                    <div class="visible-lg-inline-block navbar-delivery">Безкоштовна доставка піци</div>
+                    <button class="btn btn-warning" style="width:60px ;height:30px ; float: right">Увійти</button>
+                </div>
+                <div class="navbar-second-line">
+                    <div class="navbar-second-line-pizza visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">Піца</div>
                 </div>
             </div>
-        </nav>
-
-        <div id="label-pizza">
+        </div>
+        <div class="label-top">
             <div class="label-text">
-                <div id="first-line">PIZZA</div>
-                <div id="second-line">KMA</div>
+                <div class="first-text">PIZZA</div>
+                <div class="second-text">KMA</div>
             </div>
             <img src="assets/images/discount.svg">
         </div>
-
-        <div id="label-discount">
+        <div class="label-bottom">
             <img src="assets/images/discount.svg">
             <div class="label-text">
-                <div id="first-line">ЦЬОГО
-                    <br>ТИЖНЯ
-                    <br>НА ВСЕ</div>
-                <div id="second-line">
-                    <span>-20%</span>
-                </div>
+                <div class="label-first-text">ЦЬОГО</div>
+                <div class="label-first-text">ТИЖНЯ</div>
+                <div class="label-first-text">НА ВСЕ</div>
+                <div class="label-second-text">-20%</div>
+            </div>
+		</div>
+		
+        <div class="col-xs-12" style="height:120px"></div>
+		
+		<div class="form-description">
+			1. Контактні дані
+		</div>
+		<form class="form-horizontal">
+			<div class="form-group name-group">
+				<label class="col-sm-2 control-label" id="name-label">Ім’я</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="text" id="inputName" name="inputName" placeholder="Ім’я Прізвище">
+				</div>
+				<span class="help-block" id="name-error" style="display:none">
+					Введіть тільки власне ім’я, без цифр
+					</span>
+			</div>
+			<div class="form-group phone-group">
+				<label class="col-sm-2 control-label" id="phone-label">Телефон</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="text" id="inputPhone" name="inputPhone" placeholder="+380994010999">
+				</div>
+				<span class="help-block" id="phone-error" style="display:none">
+					Введіть номер телефону у форматі +380 або почніть з 0
+					</span>
+			</div>
+			<div class="form-group address-group">
+				<label class="col-sm-2 control-label" id="address-label">Адреса</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="text" id="inputAddress" name="inputAddress" placeholder="Київ, вул. Спаська, 2">
+				</div>
+				<span class="help-block" id="address-error" style="display:none">
+					Введіть адресу доставки піци
+					</span>
+			</div>
+		</form>
+
+		<div class="bs-callout bs-callout-warning">
+			<h4>Інформація про замовлення</h4>
+			<p>
+				<b>Приблизний час доставки: </b>
+				<b class="order-time">невідомий</b>
+			</p>
+			<p>
+				<b>Адреса доставки: </b>
+				<b class="order-address font-weight-light">невідома</b>
+			</p>
+		</div>
+
+		<div class="col-md-5 time-address-info">
+
+		</div>
+		<div>
+			<div class="form-group next-step-wrap">
+				<a id="forward" class="btn btn-warning" style="float: right">Далі <span
+				class="glyphicon glyphicon-menu-right" ></span></a>
+			</div>
+		</div>
+
+    </div>
+    <div id="cart">
+        <div id="cart-head">
+            <div class="ct-order">Замовлення</div>
+            <div id="ct-count">2</div>
+        </div>
+        <div id="ct-container" class="ct-container"></div>
+        <div class="cart-bottom">
+            <div class="ct-summ">
+                <p class="ct-summ-t">Сума замовлення</p>
+                <p id="ct-summ"></p>
+            </div>
+            <div id="ct-order">
+            <button class="btn btn-default" id="edit">Редагувати замовлення</button>
             </div>
         </div>
-
-        <div id="order-form-container" class="container">
-            <h3>1. Контактні дані</h3>
-
-            <div id="form-container" class="row">
-
-                <div id="order-form" class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
-                    <form>
-                        <div class="form-group row">
-                            <label id="name-label" for="name" class="col-2 col-form-label">Ім'я</label>
-                            <div class="col-10">
-                                <input type="text" class="form-control shadow-none" id="name-input" placeholder="Ім'я Прізвище">
-                                <p id="name-error">Введіть коректне ім'я в форматі Ім'я Прізвище</p>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label id="phone-label" for="phone" class="col-2 col-form-label">Телефон</label>
-                            <div class="col-10">
-                                <input type="text" class="form-control shadow-none" id="phone-input" placeholder="+380994010999">
-                                <p id="phone-error">Введіть коректний номер телефону, що починається з 0 або +380</p>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label id="address-label" for="address" class="col-2 col-form-label">Адреса</label>
-                            <div class="col-10">
-                                <input type="text" class="form-control shadow-none" id="address-input"
-                                    placeholder="Київ, вул. Спаська, 2">
-                                <p id="address-error">Введіть коректну адресу</p>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <div id="order-summary-container" class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
-                    <div id="order-summary">
-                        <h5>Інформація про замовлення</h5>
-                        <h6>Приблизний час доставки:
-                            <span>невідомий</span>
-                        </h6>
-                        <h6>
-                            Адреса доставки:
-                            <span>невідома</span>
-                        </h6>
-                    </div>
-                </div>
-
-            </div>
-
-            <button id="process-order" class="btn btn-warning shadow-none float-right">
-                Далі
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
-
-
-    <div id="footer">
-        <p>Pizza.22 - практичний проект в межах курсу JavaScript у Києво-Могилянській Академії.</p>
-        <p>Доставка піци не здійснюється.</p>
-    </div>
-</div>
-
-<div id="cart" class="cart-visible d-flex flex-column">
-
-    <button id="cart-toggler" class="btn btn-primary shadow-none cart-visible">
-        <div id="arrow-hide">
-            <i class="fas fa-chevron-right"></i>
-        </div>
-        <div id="cart-icon">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="total-price-value">0</span>
-            <span id="currency">грн.</span>
-        </div>
-    </button>
-
-    <div id="cart-title">
-        <h4 id="title">
-            Замовлення
-            <span id="cart-items-count" class="items-count">0</span>
-        </h4>
-    </div>
-
-    <div id="cart-body">
-
-    </div>
-
-    <div id="cart-checkout" class="mt-auto">
-        <span id="price-label">Сума замовлення</span>
-        <span id="price" class="float-right">
-            <span class="total-price-value">0</span>
-            грн.
-        </span>
-        <div id="order">
-            <button id="edit-order-button" class="btn btn-edit-order shadow-none">Редагувати замовлення</button>
-        </div>
-    </div>
-
+	</div>
 </div>
 
 <% include common/footer.ejs %>

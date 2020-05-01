@@ -1,7 +1,7 @@
-const API_URL = "http://127.0.0.1:5050";
+var API_URL = "http://localhost:5050"; // Адрес сервера, к которому мы обращаемся, чтобы получить список пицц
 
 function backendGet(url, callback) {
-    $.ajax({
+    $.ajax({ // Библиотека, которая отвечает за то, чтобы делать запросы
         url: API_URL + url,
         type: "GET",
         success: data => {
@@ -28,10 +28,10 @@ function backendPost(url, data, callback) {
     })
 }
 
-exports.getPizzaList = callback => {
-    backendGet("/api/get-pizza-list/", callback);
+exports.getPizzaList = function(callback) {
+    backendGet("/api/get-pizza-list/", callback); // Забрать пиццы
 };
 
-exports.createOrder = (orderInfo, callback) => {
-    backendPost("/api/create-order/", orderInfo, callback);
+exports.createOrder = function(orderInfo, callback) {
+    backendPost("/api/create-order/", orderInfo, callback); // Оформить заказ
 };

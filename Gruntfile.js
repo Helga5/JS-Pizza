@@ -5,25 +5,29 @@ module.exports = function(grunt) {
     //Налаштування збірки Grunt
     var config = {
         //Інформацію про проект з файлу package.json
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: grunt.file.readJSON("package.json"),
 
         //Конфігурація для модуля browserify (перетворює require(..) в код
-        browserify:     {
+        browserify: {
             //Загальні налаштування (grunt-browserify)
-            options:      {
-
+            options: {
                 //brfs замість fs.readFileSync вставляє вміст файлу
-                transform:  [ require('brfs') ],
+                transform: [require("brfs")],
                 browserifyOptions: {
                     //Папка з корнем джерельних кодів javascript
                     basedir: "Frontend/src/js/"
                 }
             },
 
-            //Збірка з назвою піца
-            pizza: {
-                src:        'Frontend/src/main.js',
-                dest:       'Frontend/www/assets/js/main.js'
+
+			// Заходим в mainPage.js в папке src, подргужаем нужные файлы и объединяем их в один main.js в www
+            mainPage: {
+                src: "Frontend/src/mainPage.js",
+                dest: "Frontend/www/assets/js/main.js"
+            },
+            orderPage: {
+                src: "Frontend/src/order/orderPage.js",
+                dest: "Frontend/www/assets/js/order.js"
             }
         }
     };
@@ -31,33 +35,28 @@ module.exports = function(grunt) {
     //Налаштування відстежування змін в проекті
     var watchDebug = {
         options: {
-            'no-beep': true
+            "no-beep": true
         },
         //Назва завдання будь-яка
         scripts: {
             //На зміни в яких файлах реагувати
-            files: ['Frontend/src/**/*.js', 'Frontend/**/*.ejs'],
+            files: ["Frontend/src/**/*.js", "Frontend/**/*.ejs"],
             //Які завдання виконувати під час зміни в файлах
-            tasks: ['browserify:pizza']
+            tasks: ["browserify:mainPage", "browserify:orderPage"]
         }
     };
-
 
     //Ініціалузвати Grunt
     config.watch = watchDebug;
     grunt.initConfig(config);
 
     //Сказати які модулі необхідно виокристовувати
-    grunt.loadNpmTasks('grunt-browserify');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-
+    grunt.loadNpmTasks("grunt-browserify");
+    grunt.loadNpmTasks("grunt-contrib-watch");
 
     //Список завданнь по замовчування
-    grunt.registerTask('default',
-        [
-            'browserify:pizza',
-            //Інші завдання які необхідно виконати
-        ]
-    );
-
+    grunt.registerTask("default", [
+        "browserify:pizza"
+        //Інші завдання які необхідно виконати
+    ]);
 };

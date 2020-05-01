@@ -1,39 +1,33 @@
-const TEMPLATES = require("../Templates");
-const LOCAL_STORAGE = require("../LocalStorage");
-const CART_TOGGLER = require("../CartToggler");
+const templates = require("../Templates");
+const storage = require("../storage");
 
-const $CART = $("#cart-body");
-const $ITEMS_COUNT = $("#cart-items-count");
-const $TOTAL_PRICE = $(".total-price-value");
+var $cart = $("#ct-container");
+var $items_count = $("#ct-count");
+var $total_price = $("#ct-summ");
 
-let Cart;
+var Cart;
 
 function initializeCart() {
-    Cart = LOCAL_STORAGE.get("cart");
-    if (!Cart)
-        console.log("empty cart");
+    Cart = storage.get("cart");
 
-    $CART.html("");
-
-    let totalPrice = 0;
-    Cart.forEach(item => {
+    var totalPrice = 0;
+    Cart.forEach(function(item) {
         totalPrice += item.quantity * item.pizza[item.size.field].price;
-        var htmlCode = TEMPLATES.OrderCartItem(item);
+        var htmlCode = templates.OrderCart_OneItem(item); // Делаем html из ejs
         var $node = $(htmlCode);
-        $CART.append($node);
+        $cart.append($node);
     });
 
-    $TOTAL_PRICE.text(totalPrice);
-    $ITEMS_COUNT.text(Cart.length);
-    $("#edit-order-button").click(() => {
+    $total_price.text(totalPrice);
+    $items_count.text(Cart.length);
+    $("#edit").click(function() {
         window.location.href = "/";
     });
-    CART_TOGGLER.initializeCart();
 }
 
-function getCartItems() {
+function getPizzaInCart() {
     return Cart;
 }
 
 exports.initializeCart = initializeCart;
-exports.getCartItems = getCartItems;
+exports.getPizzaInCart = getPizzaInCart;

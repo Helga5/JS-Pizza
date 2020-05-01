@@ -1,8 +1,8 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const API_URL = "http://localhost:5050";
+var API_URL = "http://localhost:5050"; // Адрес сервера, к которому мы обращаемся, чтобы получить список пицц
 
 function backendGet(url, callback) {
-    $.ajax({
+    $.ajax({ // Библиотека, которая отвечает за то, чтобы делать запросы
         url: API_URL + url,
         type: "GET",
         success: data => {
@@ -29,402 +29,183 @@ function backendPost(url, data, callback) {
     })
 }
 
-exports.getPizzaList = callback => {
-    backendGet("/api/get-pizza-list/", callback);
+exports.getPizzaList = function(callback) {
+    backendGet("/api/get-pizza-list/", callback); // Забрать пиццы
 };
 
-exports.createOrder = (orderInfo, callback) => {
-    backendPost("/api/create-order/", orderInfo, callback);
+exports.createOrder = function(orderInfo, callback) {
+    backendPost("/api/create-order/", orderInfo, callback); // Оформить заказ
 };
 
 },{}],2:[function(require,module,exports){
-const LOCAL_STORAGE = require("./LocalStorage");
-
-let cartHidden;
-const $CART_BUTTON = $("#cart-toggler");
-
-function initializeCart() {
-    cartHidden = LOCAL_STORAGE.get("cart-hidden");
-    if (typeof cartHidden === "undefined") cartHidden = screen.width < 500;
-    toggleCart();
-
-    $CART_BUTTON.click(() => {
-        cartHidden = !cartHidden;
-        toggleCart();
-    });
-}
-
-function toggleCart() {
-    if (cartHidden) hideCart();
-    else showCart();
-}
-
-function showCart() {
-    LOCAL_STORAGE.set("cart-hidden", false);
-    $("#wrapper").removeClass("cart-hidden");
-    $("#footer").removeClass("cart-hidden");
-    $("#cart").removeClass("cart-hidden");
-    $CART_BUTTON.removeClass("cart-hidden");
-}
-
-function hideCart() {
-    LOCAL_STORAGE.set("cart-hidden", true);
-    $("#wrapper").addClass("cart-hidden");
-    $("#footer").addClass("cart-hidden");
-    $("#cart").addClass("cart-hidden");
-    $CART_BUTTON.addClass("cart-hidden");
-}
-
-exports.initializeCart = initializeCart;
-
-},{"./LocalStorage":3}],3:[function(require,module,exports){
-let basil = require("basil.js");
-basil = new basil();
-
-exports.get = key => basil.get(key);
-exports.set = (key, value) => basil.set(key, value);
-
-},{"basil.js":10}],4:[function(require,module,exports){
 
 var ejs = require('ejs');
 
-exports.PizzaMenuItem = ejs.compile("<%\nfunction getIngredientsArray(pizza) {\n    var content = pizza.content;\n    var result = [];\n\n    Object.keys(content).forEach(function(key){\n        result = result.concat(content[key]);\n    });\n    \n    return result;\n}\n%>\n\n<div class=\"col-sm-12 col-md-6 col-lg-6 col-xl-4\">\n    <% if(pizza.isNew) { %>\n    <div class=\"badge badge-danger badge-state\">Нова</div>\n    <% } else if(pizza.isPopular) {%>\n    <div class=\"badge badge-success badge-state\">Популярна</div>\n    <% } %>\n    <div class=\"img-thumbnail pizza-card\">\n        <img class=\"pizza-icon figure-img\" src=\"<%= pizza.icon %>\" alt=\"Pizza\">\n\n        <div class=\"pizza-body\">\n            <h3 class=\"pizza-name\">\n                <%= pizza.title %>\n            </h3>\n            <p class=\"pizza-type\">\n                <%= pizza.type %>\n            </p>\n            <p class=\"pizza-description\">\n                <%= getIngredientsArray(pizza).join(\", \") %>\n            </p>\n\n            <div class=\"container\">\n                <div class=\"row\">\n\n                    <% if(pizza.smallSize) { %>\n                    <div class=\"col pizza-choice text-center\">\n                        <div class=\"pizza-size\">\n                            <span> <img src=\"assets/images/size-icon.svg\" alt=\"Size\"> <%= pizza.smallSize.size %></span>\n                            <span> <img src=\"assets/images/weight.svg\" alt=\"Weight\"> <%= pizza.smallSize.weight %></span>\n                        </div>\n                        <div class=\"pizza-buy\">\n                            <span class=\"pizza-price\"><%= pizza.smallSize.price %></span>\n                            <span class=\"pizza-price-currency\">грн.</span>\n                            <button class=\"btn btn-buy buy-small shadow-none\">Купити</button>\n                        </div>\n                    </div>\n                    <% } if(pizza.bigSize) {%>\n                    <div class=\"col pizza-choice text-center\">\n                        <div class=\"pizza-size\">\n                            <span> <img src=\"assets/images/size-icon.svg\" alt=\"Size\"> <%= pizza.bigSize.size %></span>\n                            <span> <img src=\"assets/images/weight.svg\" alt=\"Weight\"> <%= pizza.bigSize.weight %></span>\n                        </div>\n                        <div class=\"pizza-buy\">\n                            <span class=\"pizza-price\"><%= pizza.bigSize.price %></span>\n                            <span class=\"pizza-price-currency\">грн.</span>\n                            <button class=\"btn btn-buy buy-big shadow-none\">Купити</button>\n                        </div>\n                    </div>\n                    <% } %>\n\n                </div>\n            </div>\n        </div>\n    </div>\n</div>");
-exports.PizzaCartItem = ejs.compile("<div class=\"order-item\">\n    <span class=\"item-name\">\n        <%= pizza.title %> (<%= size.string %>)\n    </span>\n    <img class=\"item-picture\" src=\"<%= pizza.icon %>\" alt=\"Pizza\">\n    <div class=\"item-size\">\n        <span class=\"size\">\n            <img src=\"assets/images/size-icon.svg\" alt=\"Size\">\n            <%= pizza[size.field].size %>\n        </span>\n        <span class=\"weight\">\n            <img src=\"assets/images/weight.svg\" alt=\"Weight\">\n            <%= pizza[size.field].weight %>\n        </span>\n    </div>\n    <div class=\"item-buttons\">\n        <span class=\"price\">\n            <%= pizza[size.field].price * quantity %>\n            грн.</span>\n        <button class=\"btn btn-danger minus shadow-none\">\n            <i class=\"fas fa-minus\"></i>\n        </button>\n        <span class=\"item-count\">\n            <%= quantity %>\n        </span>\n        <button class=\"btn btn-success plus shadow-none\">\n            <i class=\"fas fa-plus\"></i>\n        </button>\n        <button class=\"btn remove shadow-none\">\n            <i class=\"fas fa-times\"></i>\n        </button>\n    </div>\n</div>");
-exports.PizzaFilter = ejs.compile("<li class=\"nav-item\">\r\n    <a class=\"nav-link\" href=\"#\">\r\n        <%= filter.name %>\r\n    </a>\r\n</li>");
-exports.
-exports.OrderCartItem = ejs.compile("<% \r\n    function getPizzaCount(quantity) {\r\n        let count = quantity + \"\";\r\n        if (/.*1/.test(count) && !/.*11/.test(count))\r\n            return quantity + \" піца\"\r\n        \r\n        if (/.*[2-4]/.test(count) && !/.*1[2-4]/.test(count))\r\n            return quantity + \" піци\";\r\n        return quantity + \" піц\"; \r\n    }\r\n%> \r\n\r\n<div class=\"order-item\">\r\n    <span class=\"item-name\">\r\n        <%= pizza.title %> (<%= size.string %>)\r\n    </span>\r\n    <img class=\"item-picture\" src=\"<%= pizza.icon %>\" alt=\"Pizza\">\r\n    <div class=\"item-size\">\r\n        <span class=\"size\">\r\n            <img src=\"assets/images/size-icon.svg\" alt=\"Size\">\r\n            <%= pizza[size.field].size %>\r\n        </span>\r\n        <span class=\"weight\">\r\n            <img src=\"assets/images/weight.svg\" alt=\"Weight\">\r\n            <%= pizza[size.field].weight %>\r\n        </span>\r\n    </div>\r\n    <div class=\"item-buttons\">\r\n        <span class=\"price\">\r\n            <%= pizza[size.field].price * quantity %>\r\n            грн.</span>\r\n        <span class=\"item-count\">\r\n            <%= getPizzaCount(quantity) %>\r\n        </span>\r\n    </div>\r\n</div>");
-exports.LiqPayWidget = ejs.compile("<h3>2. Оплата</h3>\r\n\r\n<div id=\"form-container\" class=\"row\">\r\n    <div id=\"liqpay\" class=\"col-12\"></div>\r\n    <div id=\"liqpay-result\" class=\"col-12\">\r\n        <div class=\"alert alert-success\" role=\"alert\">\r\n            Замовлення прийняте! Очікуйте доставку.\r\n        </div>\r\n        <button id=\"btn-home\" class=\"btn btn-home shadow-none float-right\" onclick=\"window.location.href = '/';\">На головну</button>\r\n    </div>\r\n</div>");
+exports.PizzaMenu_OneItem = ejs.compile("<%\r\n\r\nfunction getIngredientsArray(pizza) {\r\n    //Отримує вміст піци\r\n    var content = pizza.content;\r\n    var result = [];\r\n\r\n    //Object.keys повертає масив ключів в об’єкті JavaScript\r\n\r\n    Object.keys(content).forEach(function(key){\r\n\r\n        //a.concat(b) створює спільний масив із масивів a та b\r\n        result = result.concat(content[key]);\r\n    });\r\n\r\n    return result;\r\n}\r\n\r\n   %>\r\n<div class=\"col-md-6 col-lg-4 pizza-card\">\r\n\t<% if(pizza.is_new) { %>\r\n\t<div class=\"label label-danger state-label\">Нова</div>\r\n\t<% } else if(pizza.is_popular) {%>\r\n\t<div class=\"label label-success state-label\">Популярна</div>\r\n\t<% } %>\r\n\t<div class=\"thumbnail\">\r\n\t\t<img src=\"<%= pizza.icon %>\">\r\n\t\t<div class=\"caption\">\r\n\t\t\t<h3><%= pizza.title %></h3>\r\n\t\t\t<span class=\"pc-type\"><%= pizza.type %></span>\r\n\t\t\t<p class=\"pc-description\">\r\n\t\t\t\t<%= getIngredientsArray(pizza).join(\", \") %>\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t\t<div class=\"row pc-button-row\">\r\n\t\t\t<% if (pizza.smallSize) { %>\r\n\t\t\t<div class=\"<% if (pizza.smallSize && pizza.bigSize) { %> col-xs-6 <% }\r\n            else { %> col-xs-12 <% } %>\">\r\n\t\t\t\t<div class=\"pc-diameter diameter-icon\"><%= pizza.smallSize.size %></div>\r\n\t\t\t\t<div class=\"pc-weight weight-icon\"><%= pizza.smallSize.weight %></div>\r\n\t\t\t\t<h3 class=\"pc-price\"><%= pizza.smallSize.price %></h3>\r\n\t\t\t\t<p class=\"pc-price-uah\">грн.</p>\r\n\t\t\t\t<a class=\"btn btn-warning buy-small\">Купити</a>\r\n\t\t\t</div>\r\n\t\t\t<% } %>\r\n\t\t\t<% if (pizza.bigSize) { %>\r\n\t\t\t<div class=\"<% if (pizza.smallSize && pizza.bigSize) { %> col-xs-6 <% }\r\n            else { %> col-xs-12 <% } %>\">\r\n\t\t\t\t<div class=\"pc-diameter diameter-icon\"><%= pizza.bigSize.size %></div>\r\n\t\t\t\t<div class=\"pc-weight weight-icon\"><%= pizza.bigSize.weight %></div>\r\n\t\t\t\t<h3 class=\"pc-price\"><%= pizza.bigSize.price %></h3>\r\n\t\t\t\t<p class=\"pc-price-uah\">грн.</p>\r\n\t\t\t\t<a class=\"btn btn-warning buy-big\">Купити</a>\r\n\t\t\t</div>\r\n\t\t\t<% } %>\r\n\t\t</div>\r\n\t</div>\r\n</div>");
+exports.PizzaCart_OneItem = ejs.compile("<div class=\"ct-typeorder\">\r\n    <span class=\"ct-name\"><%= pizza.title %> (<%= size.string %>)<img src=\"<%= pizza.icon %>\"\r\n                                                                                            class=\"ct-image\"></span>\r\n    <div class=\"ct-icons\">\r\n        <div class=\"diameter-icon\"><%= pizza[size.field].size %></div>\r\n        <div class=\"weight-icon\"><%= pizza[size.field].weight %></div>\r\n    </div>\r\n    <div class=\"ct-buttons\">\r\n        <span class=\"ct-price\"><%= pizza[size.field].price %>грн</span>\r\n        <a class=\"btn btn-danger glyphicon glyphicon-minus dec-button\"></a>\r\n        <span class=\"ct-amount\"><%= quantity %></span>\r\n        <a class=\"btn btn-success glyphicon glyphicon-plus inc-button\"></a>\r\n        <a class=\"btn button-remove glyphicon glyphicon-remove rem-button\"></a>\r\n    </div>\r\n</div>");
+exports.OrderCart_OneItem = ejs.compile("<div class=\"ct-typeorder\">\n    <span class=\"ct-name\"><%= pizza.title %> (<%= size.string %>)<img src=\"<%= pizza.icon %>\"\n                                                                                            class=\"ct-image\"></span>\n    <div class=\"ct-icons\">\n        <div class=\"diameter-icon\"><%= pizza[size.field].size %></div>\n        <div class=\"weight-icon\"><%= pizza[size.field].weight %></div>\n    </div>\n    <div class=\"ct-buttons\">\n        <span class=\"ct-price\"><%= pizza[size.field].price %>грн</span>\n        <span class=\"ct-amount\"><%= quantity %> штука</span>\n    </div>\n</div>");
 
-},{"ejs":12}],5:[function(require,module,exports){
-const SUMMARY_OPERATOR = require("./SummaryOperator");
+},{"ejs":8}],3:[function(require,module,exports){
+const templates = require("../Templates");
+const storage = require("../storage");
 
-const GOOGLE_MAPS = require("./GoogleMaps");
+var $cart = $("#ct-container");
+var $items_count = $("#ct-count");
+var $total_price = $("#ct-summ");
 
-const $name = $("#name-input");
-const $phone = $("#phone-input");
-const $address = $("#address-input");
-
-const $nameLabel = $("#name-label");
-const $phoneLabel = $("#phone-label");
-const $addressLabel = $("#address-label");
-
-const $nameError = $("#name-error");
-const $phoneError = $("#phone-error");
-const $addressError = $("#address-error");
-
-const NAME_REGEX = /^([А-я]|[І,і,Ї,ї,Є,є]){3,12}\s([А-я]|[І,і,Ї,ї,Є,є]){2,16}$/;
-const PHONE_REGEX = /^(\+38)?0[3-9]\d{8}$/;
-const ADDRESS_REGEX = /[\s\S]{10,100}/;
-
-function initializeValidators() {
-    initializeValidator($name, NAME_REGEX, $nameLabel, $nameError);
-    initializeValidator($phone, PHONE_REGEX, $phoneLabel, $phoneError);
-    initializeAddressValidator();
-}
-
-function initializeValidator(input, regex, label, errorLabel) {
-    input.focusout(() => validate());
-    $("#process-order").click(() => {
-        validate();
-    });
-
-    function validate() {
-        if (!regex.test(input.val().trim())) {
-            input.removeClass("validation-success");
-            input.addClass("validation-error");
-            label.removeClass("validation-success");
-            label.addClass("validation-error");
-            errorLabel.addClass("visible");
-        } else {
-            input.removeClass("validation-error");
-            input.addClass("validation-success");
-            label.removeClass("validation-error");
-            label.addClass("validation-success");
-            errorLabel.removeClass("visible");
-        }
-    }
-}
-
-function initializeAddressValidator() {
-    $address.focusout(() => {
-        if (ADDRESS_REGEX.test($address.val().trim()))
-            GOOGLE_MAPS.processAddress($address.val().trim(), validateAddress);
-        else validateAddress("Вкажіть коректну адресу.")
-    });
-}
-
-function validateAddress(err, deliveryDuration) {
-    if (err) {
-        SUMMARY_OPERATOR.resetData();
-        $address.removeClass("validation-success");
-        $address.addClass("validation-error");
-        $addressLabel.removeClass("validation-success");
-        $addressLabel.addClass("validation-error");
-        $addressError.text(err);
-        $addressError.addClass("visible");
-    }
-    else {
-        SUMMARY_OPERATOR.updateData($address.val().trim(), deliveryDuration);
-        $address.addClass("validation-success");
-        $address.removeClass("validation-error");
-        $addressLabel.addClass("validation-success");
-        $addressLabel.removeClass("validation-error");
-        $addressError.removeClass("visible");
-    }
-}
-
-function isValid() {
-    return (
-        $name.hasClass("validation-success") &&
-        $phone.hasClass("validation-success") &&
-        $address.hasClass("validation-success")
-    );
-}
-
-function getFormData() {
-    if (!isValid()) return null;
-    return {
-        name: $name.val().trim(),
-        phone: $phone.val(),
-        address: $address.val().trim()
-    };
-}
-
-exports.initializeValidators = initializeValidators;
-exports.validateAddress = validateAddress;
-exports.isValid = isValid;
-exports.getFormData = getFormData;
-
-},{"./GoogleMaps":6,"./SummaryOperator":8}],6:[function(require,module,exports){
-const FORM_VALIDATOR = require("./FormValidator");
-
-const ORIGIN_POINT = new google.maps.LatLng(50.464379, 30.519131);
-
-const $map = document.getElementById("google-map");
-let map;
-let geocoder = new google.maps.Geocoder();
-let directionService = new google.maps.DirectionsService();
-let directionsRenderer = new google.maps.DirectionsRenderer();
-let destinationMarker;
-
-function initializeMap() {
-    let mapProp = {
-        center: ORIGIN_POINT,
-        zoom: 11
-    };
-    map = new google.maps.Map($map, mapProp);
-    drawOriginMarker();
-    google.maps.event.addListener(map, "click", getAddressOfClick);
-}
-
-function resetMap() {
-    if (destinationMarker) {
-        destinationMarker.setMap(null);
-        directionsRenderer.setMap(null);
-    }
-}
-
-function drawOriginMarker() {
-    let marker = new google.maps.Marker({
-        position: ORIGIN_POINT,
-        map: map,
-        icon: "assets/images/home-icon.png"
-    });
-}
-
-function getAddressOfClick(click) {
-    resetMap();
-    var destinationPoint = click.latLng;
-    geocodeLatLng(destinationPoint, function(err, address) {
-        if (!err) {
-            $("#address-input").val(address);
-            drawDestinationMarker(destinationPoint);
-            findRoute(destinationPoint, FORM_VALIDATOR.validateAddress);
-        } else FORM_VALIDATOR.validateAddress(err);
-    });
-}
-
-function geocodeLatLng(latlng, callback) {
-    var geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location: latlng }, function(results, status) {
-        if (status === google.maps.GeocoderStatus.OK && results[1]) {
-            var adress = results[1].formatted_address;
-            callback(null, adress);
-        } else {
-            callback("Вкажіть коректну адресу.");
-        }
-    });
-}
-
-function geocodeAddress(address, callback) {
-    resetMap();
-    geocoder.geocode({ address: address }, function(results, status) {
-        if (status === google.maps.GeocoderStatus.OK && results[0]) {
-            let destinationPoint = results[0].geometry.location;
-            drawDestinationMarker(destinationPoint);
-            findRoute(destinationPoint, callback);
-        } else callback("Вкажіть коректну адресу.");
-    });
-}
-
-function drawDestinationMarker(destinationPoint) {
-    destinationMarker = new google.maps.Marker({
-        position: destinationPoint,
-        map: map,
-        icon: "assets/images/map-icon.png"
-    });
-}
-
-function findRoute(destinationPoint, callback) {
-    let route = {
-        origin: ORIGIN_POINT,
-        destination: destinationPoint,
-        travelMode: google.maps.TravelMode["DRIVING"]
-    };
-    directionService.route(route, function(response, status) {
-        if (status == google.maps.DirectionsStatus.OK) {
-            let leg = response.routes[0].legs[0];
-            drawRoute(response);
-            callback(null, leg.duration.text);
-        } else callback("Не змогли знайти шлях... Вкажіть іншу адресу.");
-    });
-}
-
-function drawRoute(route) {
-    directionsRenderer.setMap(map);
-    directionsRenderer.setOptions({ suppressMarkers: true });
-    directionsRenderer.setDirections(route);
-}
-
-exports.initializeMap = initializeMap;
-exports.processAddress = geocodeAddress;
-
-},{"./FormValidator":5}],7:[function(require,module,exports){
-const TEMPLATES = require("../Templates");
-const LOCAL_STORAGE = require("../LocalStorage");
-const CART_TOGGLER = require("../CartToggler");
-
-const $CART = $("#cart-body");
-const $ITEMS_COUNT = $("#cart-items-count");
-const $TOTAL_PRICE = $(".total-price-value");
-
-let Cart;
+var Cart;
 
 function initializeCart() {
-    Cart = LOCAL_STORAGE.get("cart");
-    $CART.html("");
+    Cart = storage.get("cart");
 
-    let totalPrice = 0;
-    Cart.forEach(item => {
+    var totalPrice = 0;
+    Cart.forEach(function(item) {
         totalPrice += item.quantity * item.pizza[item.size.field].price;
-        var htmlCode = TEMPLATES.OrderCartItem(item);
+        var htmlCode = templates.OrderCart_OneItem(item); // Делаем html из ejs
         var $node = $(htmlCode);
-        $CART.append($node);
+        $cart.append($node);
     });
 
-    $TOTAL_PRICE.text(totalPrice);
-    $ITEMS_COUNT.text(Cart.length);
-    $("#edit-order-button").click(() => {
+    $total_price.text(totalPrice);
+    $items_count.text(Cart.length);
+    $("#edit").click(function() {
         window.location.href = "/";
     });
-    CART_TOGGLER.initializeCart();
 }
 
-function getCartItems() {
+function getPizzaInCart() {
     return Cart;
 }
 
-function clearCart() {
-    Cart = [];
-    LOCAL_STORAGE.set("cart", Cart);
-    initializeCart();
-}
-
 exports.initializeCart = initializeCart;
-exports.getCartItems = getCartItems;
-exports.clearCart = clearCart;
+exports.getPizzaInCart = getPizzaInCart;
 
-},{"../CartToggler":2,"../LocalStorage":3,"../Templates":4}],8:[function(require,module,exports){
-const $address = $("#destination-address");
-const $deliveryDuration = $("#delivery-duration");
+},{"../Templates":2,"../storage":5}],4:[function(require,module,exports){
+$(function () {
+	const API = require("../API");
+	const order_cart = require("./OrderCart");
 
-function updateData(address, duration) {
-    $address.text(address);
-    $deliveryDuration.text(duration);
-}
+	order_cart.initializeCart();
+	initializeForm();
 
-function resetData() {
-    $address.text("невідома");
-    $deliveryDuration.text("невідомий");
-}
+	function initializeForm() {
+		initializeName();
+		initializePhone();
+		initializeAddress();
+	}
 
-exports.updateData = updateData;
-exports.resetData = resetData;
+	function initializeName() {
+		$("#inputName").focusout(function () { // потеря фокуса элементом, или любым вложенным элементом
+			if (isNameCorrect()) {
+				$("#inputName").removeClass("invalid-feedback");
+				$("#name-label").removeClass("invalid-feedback");
+				$("#name-error").hide();
 
-},{}],9:[function(require,module,exports){
-$(document).ready(() => {
-    const ORDER_CART = require("./OrderCart");
-    const FORM_VALIDATOR = require("./FormValidator");
-    const API = require("../API");
-    const GOOGLE_MAPS = require("./GoogleMaps");
-    const TEMPLATES = require("../Templates");
+				$("#inputName").addClass("valid-feedback");
+				$("#name-label").addClass("valid-feedback");
+			} else {
+				$("#inputName").addClass("invalid-feedback");
+				$("#name-label").addClass("invalid-feedback");
+				$("#name-error").show();
 
-    ORDER_CART.initializeCart();
-    if (!ORDER_CART.getCartItems() || ORDER_CART.getCartItems().length == 0) {
-        alert("Ваш кошик порожній! Додайте щось до нього...");
-        window.location.href = "/";
-    }
+				$("#inputName").removeClass("valid-feedback");
+				$("#name-label").removeClass("valid-feedback");
+			}
+		});
+	}
 
-    GOOGLE_MAPS.initializeMap();
-    FORM_VALIDATOR.initializeValidators();
+	function initializePhone() {
+		$("#inputPhone").focusout(function () {
+			if (isPhoneCorrect()) {
+				$("#inputPhone").removeClass("invalid-feedback");
+				$("#phone-label").removeClass("invalid-feedback");
+				$("#phone-error").hide();
 
-    $("#process-order").click(() => {
-        if (!FORM_VALIDATOR.isValid()) return;
-        let data = {
-            customerData: FORM_VALIDATOR.getFormData(),
-            cart: ORDER_CART.getCartItems()
-        };
-        let $container = $("#order-form-container");
-        let $swappedContainer = $("#swapped-container");
-        $container.slideUp(250, () => {
-            $swappedContainer.hide();
-            let htmlCode = TEMPLATES.LiqPayWidget();
-            let $node = $(htmlCode);
+				$("#inputPhone").addClass("valid-feedback");
+				$("#phone-label").addClass("valid-feedback");
+			} else {
+				$("#inputPhone").addClass("invalid-feedback");
+				$("#phone-label").addClass("invalid-feedback");
+				$("#phone-error").show();
 
-            API.createOrder(data, function(err, result) {
-                initLiqPay(result);
-            });
+				$("#inputPhone").removeClass("valid-feedback");
+				$("#phone-label").removeClass("valid-feedback");
+			}
+		});
+	}
 
-            $node.appendTo($container);
-            $container.slideDown(250);
-        });
-    });
+	function initializeAddress() {
+		$("#inputAddress").focusout(function () {
+			if (isAddressCorrect()) {
+				$("#inputAddress").removeClass("invalid-feedback");
+				$("#address-label").removeClass("invalid-feedback");
+				$("#address-error").hide();
 
-    function initLiqPay(requestResult) {
-        let data = JSON.parse(requestResult);
+				$("#inputAddress").addClass("valid-feedback");
+				$("#address-label").addClass("valid-feedback");
+			} else {
+				$("#inputAddress").addClass("invalid-feedback");
+				$("#address-label").addClass("invalid-feedback");
+				$("#address-error").show();
 
-        LiqPayCheckout.init({
-            data: data.data,
-            signature: data.signature,
-            embedTo: "#liqpay",
-            mode: "embed", //	embed	||	popup
-            language: "uk"
-        })
-            .on("liqpay.callback", result =>
-                processPaymentResult(result.status)
-            )
-            .on("liqpay.close", () => (window.location.href = "/"));
-    }
+				$("#inputAddress").removeClass("valid-feedback");
+				$("#address-label").removeClass("valid-feedback");
+			}
+		});
+	}
 
-    function processPaymentResult(paymentStatus) {
-        if (paymentStatus === "success" || paymentStatus === "sandbox") {
-            ORDER_CART.clearCart();
-            $("#liqpay-result").show();
-        }
-    }
+	function isNameCorrect() {
+		var val = $("#inputName").val().trim(); // trim() убирает лишние пробелы
+		for (var i = 0; i < val.length; i++)
+			if (val.charAt(i) !== " " && val.charAt(i).toLowerCase() === val.charAt(i).toUpperCase()) return false; // Проверка на то, что мы ввели не букву
+		return val.length > 6;
+	}
+
+	function isAddressCorrect() {
+		var val = $("#inputAddress").val().trim();
+		return val.length > 12;
+	}
+
+	function isPhoneCorrect() {
+		var val = $("#inputPhone").val().trim();
+		for (var i = 0; i < val.length; i++)
+			if ((val.charAt(i) < "0" || val.charAt(i) > "9") && val.charAt(i) !== "+") return false;
+
+		if (val.length === 13) return val.substring(0, 4) === "+380";
+		if (val.length === 10) return val.charAt(0) === "0";
+
+		return false;
+	}
+
+	$("#forward").click(function() {
+		if (isNameCorrect() && isPhoneCorrect() && isAddressCorrect()) {
+			var order = {
+				name: $("#inputName").val().trim(),
+				phone: $("#inputPhone").val().trim(),
+				address: $("#inputAddress").val().trim(),
+				cart: order_cart.getPizzaInCart(),
+			};
+			API.createOrder(order, function (error, result) {
+				if (result) alert("Order completed!");
+			});
+		}
+		else return;
+	});
 });
 
-},{"../API":1,"../Templates":4,"./FormValidator":5,"./GoogleMaps":6,"./OrderCart":7}],10:[function(require,module,exports){
+},{"../API":1,"./OrderCart":3}],5:[function(require,module,exports){
+let basil = require("basil.js");
+basil = new basil();
+
+exports.get = function (key) {
+	return basil.get(key);
+};
+
+exports.set = function (key, value) {
+	basil.set(key, value);
+};
+
+},{"basil.js":6}],6:[function(require,module,exports){
 (function () {
 	// Basil
 	var Basil = function (options) {
@@ -793,9 +574,9 @@ $(document).ready(() => {
 
 })();
 
-},{}],11:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
-},{}],12:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*
  * EJS Embedded JavaScript templates
  * Copyright 2112 Matthew Eernisse (mde@fleegix.org)
@@ -1777,7 +1558,7 @@ if (typeof window != 'undefined') {
   window.ejs = exports;
 }
 
-},{"../package.json":14,"./utils":13,"fs":11,"path":15}],13:[function(require,module,exports){
+},{"../package.json":10,"./utils":9,"fs":7,"path":11}],9:[function(require,module,exports){
 /*
  * EJS Embedded JavaScript templates
  * Copyright 2112 Matthew Eernisse (mde@fleegix.org)
@@ -1946,7 +1727,7 @@ exports.cache = {
   }
 };
 
-},{}],14:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports={
   "_from": "ejs@^2.4.1",
   "_id": "ejs@2.7.4",
@@ -1970,7 +1751,7 @@ module.exports={
   "_resolved": "https://registry.npmjs.org/ejs/-/ejs-2.7.4.tgz",
   "_shasum": "48661287573dcc53e366c7a1ae52c3a120eec9ba",
   "_spec": "ejs@^2.4.1",
-  "_where": "C:\\Users\\d4ywasted\\Desktop\\JavascriptP2.2\\Week5",
+  "_where": "C:\\Users\\Helga\\Desktop\\My_JS",
   "author": {
     "name": "Matthew Eernisse",
     "email": "mde@fleegix.org",
@@ -2016,7 +1797,7 @@ module.exports={
   "version": "2.7.4"
 }
 
-},{}],15:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (process){
 // .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
 // backported and transplited with Babel, with backwards-compat fixes
@@ -2322,7 +2103,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":16}],16:[function(require,module,exports){
+},{"_process":12}],12:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -2508,4 +2289,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[9]);
+},{}]},{},[4]);
